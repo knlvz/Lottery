@@ -6,3 +6,4 @@ altair
 google-genai
 openai
 openpyxl
+tqdm

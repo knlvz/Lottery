@@ -1,0 +1,34 @@
+name: Update Lottery Data
+
+on:
+  schedule:
+    # 每天 UTC 时间 22:00 执行（对应北京时间次日 06:00）
+    - cron: '0 22 * * *'
+  workflow_dispatch: # 支持在网页上手动点击触发
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run data update script
+        run: python request_data_update.py
+
+      - name: Commit and push updated data
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          # 这里假设你的数据保存在 data 目录下，如果不是，请根据实际情况修改下面的 data/
+          git add data/
+          git diff --staged --quiet || git commit -m "Auto-update lottery data $(date +'%Y-%m-%d')"
+          git push
